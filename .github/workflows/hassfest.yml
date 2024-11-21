@@ -1,0 +1,18 @@
+name: Validate with hassfest
+
+on:
+  push:
+    paths:
+      - custom_components/switch_fan/*
+  pull_request:
+    paths:
+      - custom_components/switch_fan/*
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  validate:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v2"
+      - uses: "home-assistant/actions/hassfest@master"
