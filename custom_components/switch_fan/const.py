@@ -2,3 +2,4 @@
 
 DOMAIN = "switch_fan"
 
+CONF_HIDE_MEMBERS = "hide_members"
