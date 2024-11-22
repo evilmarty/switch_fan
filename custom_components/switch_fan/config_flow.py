@@ -1,77 +1,68 @@
-import voluptuous as vol
-from typing import Any
+"""Config flow for Switch Fan integration."""
 
-from homeassistant.config_entries import (
-    ConfigEntry,
-    ConfigFlowResult,
-    ConfigFlow,
-    OptionsFlow,
-)
-from homeassistant.const import (
-    CONF_ENTITIES,
-    CONF_NAME,
-)
+from __future__ import annotations
+
+from collections.abc import Mapping
+from typing import Any, cast
+
+import voluptuous as vol
+
+from homeassistant.components.input_boolean import DOMAIN as INPUT_BOOLEAN_DOMAIN
+from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
+from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
+from homeassistant.config_entries import ConfigFlowResult
+from homeassistant.const import CONF_DEVICE_ID, CONF_ENTITIES, CONF_NAME
 from homeassistant.core import callback
-from homeassistant.helpers.selector import selector
+from homeassistant.helpers import selector
+from homeassistant.helpers.schema_config_entry_flow import (
+    SchemaConfigFlowHandler,
+    SchemaFlowFormStep,
+    SchemaFlowMenuStep,
+)
 
 from .const import DOMAIN
 
-
-DATA_SCHEMA = vol.Schema({
-    vol.Required(CONF_NAME): str,
-    vol.Required(CONF_ENTITIES): selector({
-        "entity": {
-            "filter": {
-                "domain": ["switch", "light"],
-            },
-            "multiple": True,
-        }
-    }),
-})
-
-
-class SwitchFanConfigFlow(ConfigFlow, domain=DOMAIN):
-    """Switch Fan Config Flow"""
-
-    VERSION = 1
-    MINOR_VERSION = 1
-    
-    async def async_step_user(self, user_input) -> ConfigFlowResult:
-        if user_input is not None:
-            return self.async_create_entry(
-                title=user_input["name"],
-                data={},
-                options=user_input,
+OPTIONS_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_ENTITIES): selector.EntitySelector(
+            selector.EntitySelectorConfig(
+                domain=[INPUT_BOOLEAN_DOMAIN, LIGHT_DOMAIN, SWITCH_DOMAIN],
+                multiple=True,
             )
+        ),
+        vol.Optional(CONF_DEVICE_ID): selector.DeviceSelector(),
+    }
+)
 
-        return self.async_show_form(
-            step_id="user", data_schema=DATA_SCHEMA
-        )
+CONFIG_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_NAME): selector.TextSelector(),
+    }
+).extend(OPTIONS_SCHEMA.schema)
 
-    @staticmethod
+CONFIG_FLOW: dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
+    "user": SchemaFlowFormStep(CONFIG_SCHEMA)
+}
+
+OPTIONS_FLOW: dict[str, SchemaFlowFormStep | SchemaFlowMenuStep] = {
+    "init": SchemaFlowFormStep(OPTIONS_SCHEMA)
+}
+
+
+class ConfigFlowHandler(SchemaConfigFlowHandler, domain=DOMAIN):
+    """Handle a config or options flow for Switch Fan."""
+
+    config_flow = CONFIG_FLOW
+    options_flow = OPTIONS_FLOW
+
+    def async_config_entry_title(self, options: Mapping[str, Any]) -> str:
+        """Return config entry title."""
+        return cast(str, options[CONF_NAME]) if CONF_NAME in options else ""
+
     @callback
-    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
-        return SwitchFanOptionsFlowHandler(config_entry)
-
-
-class SwitchFanOptionsFlowHandler(OptionsFlow):
-    """Switch Fan Options Flow"""
-
-    def __init__(self, config_entry: ConfigEntry) -> None:
-        self.config_entry = config_entry  # HA should be setting this but its not
-
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
+    def async_create_entry(
+        self, data: Mapping[str, Any], **kwargs: Any
     ) -> ConfigFlowResult:
-        if user_input is not None:
-            self.hass.config_entries.async_update_entry(
-                self.config_entry, options=user_input
-            )
-            return self.async_create_entry(title=None, data=None)
-
-        return self.async_show_form(
-            step_id="init",
-            data_schema=self.add_suggested_values_to_schema(
-                DATA_SCHEMA, self.config_entry.options
-            ),
-        )
+        """Finish config flow and create a config entry."""
+        self._async_abort_entries_match({CONF_ENTITIES: data[CONF_ENTITIES]})
+        return super().async_create_entry(data, **kwargs)

@@ -1,20 +1,15 @@
 {
-  "title": "Switch Fan",
-  "common": {
-    "entities": "Entities"
-  },
   "config": {
     "step": {
       "user": {
-        "title": "New switch fan",
-        "description": "Define a fan from a series of switches and lights.",
+        "description": "New Switch Fan",
         "data": {
-          "name": "[%key:common::config_flow::data::name%]",
-          "entities": "[%key:component::switch_fan::common::entities%]"
+          "device_id": "[%key:common::config_flow::data::device%]",
+          "entities": "Entities (slowest to fastest)",
+          "name": "[%key:common::config_flow::data::name%]"
         }
       }
     },
-    "error": {},
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     }
@@ -22,10 +17,8 @@
   "options": {
     "step": {
       "init": {
-        "title": "Modify switch fan",
         "data": {
-          "name": "[%key:common::config_flow::data::name%]",
-          "entities": "[%key:component::switch_fan::common::entities%]"
+          "entities": "[%key:component::switch_fan::config::step::user::data::entities%]"
         }
       }
     }

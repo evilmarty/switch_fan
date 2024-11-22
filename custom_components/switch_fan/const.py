@@ -1,3 +1,4 @@
-from typing import Final
+"""Constants for the Switch Fan integration."""
 
-DOMAIN: Final[str] = "switch_fan"
+DOMAIN = "switch_fan"
+
