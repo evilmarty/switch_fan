@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - custom_components/switch_fan/*
+      - tests/*
   pull_request:
     paths:
       - custom_components/switch_fan/*
+      - tests/*
   schedule:
     - cron: "0 0 * * *"
 
