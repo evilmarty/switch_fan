@@ -1,0 +1,28 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "New Switch Fan",
+        "data": {
+          "device_id": "[%key:common::config_flow::data::device%]",
+          "entities": "Entities (slowest to fastest)",
+          "hide_members": "Hide members",
+          "name": "[%key:common::config_flow::data::name%]"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "entities": "[%key:component::switch_fan::config::step::user::data::entities%]",
+          "hide_members": "[%key:component::switch_fan::config::step::user::data::hide_members%]"
+        }
+      }
+    }
+  }
+}
