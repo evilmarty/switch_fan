@@ -177,11 +177,10 @@ class SwitchFan(FanEntity):
         index = value - 1
         entity_id = self.entity_ids[index]
         await self.call_service(SERVICE_TURN_ON, [entity_id])
-        # TODO: Add option to allow turning off all remaining entities
-        # await self.call_service(
-        #     SERVICE_TURN_OFF,
-        #     [eid for eid in self.entity_ids if eid != entity_id],
-        # )
+        await self.call_service(
+            SERVICE_TURN_OFF,
+            [eid for eid in self.entity_ids if eid != entity_id],
+        )
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off the fan.
@@ -193,6 +192,7 @@ class SwitchFan(FanEntity):
     async def async_turn_on(
         self,
         percentage: int | None = None,
+        preset_mode: str | None = None,
         **kwargs: Any,
     ) -> None:
         """Turn on the fan.
@@ -200,9 +200,10 @@ class SwitchFan(FanEntity):
         If a percentage is given then the fan speed is set to that. Otherwise
         the first entity is turned on.
         """
-        if percentage:
+        if percentage is not None:
             await self.async_set_percentage(percentage)
         elif self.is_on:
+            # If we're on then do nothing
             return
         else:
             await self.async_increase_speed()
