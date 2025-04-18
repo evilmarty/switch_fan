@@ -77,8 +77,8 @@ class SwitchFan(FanEntity):
     ) -> None:
         """Initialize the fan entity."""
         features = FanEntityFeature.TURN_ON | FanEntityFeature.TURN_OFF
-        # If we have more than 2 entity then we can set multiple speeds
-        if len(entity_ids) > 2:
+        # If we have more than 1 entity then we can set multiple speeds
+        if len(entity_ids) > 1:
             features |= FanEntityFeature.SET_SPEED
         self.entity_ids = entity_ids
         self.entity_states = {}
