@@ -2,6 +2,8 @@
 
 A Home Assistant helper that combines multiple switches and lights into a fan entity.
 
+Requires Home Assistant 2026.8.0 or newer.
+
 ## Installation
 
 There are two ways this integration can be installed into [Home Assistant](https://www.home-assistant.io).
@@ -26,3 +28,7 @@ After you have installed the custom component (see above):
 3. Search for Switch Fan. (If you don't see it, try refreshing your browser page to reload the cache.)
 4. Supply a name for the new fan and select all the entities to be used by the fan. The order is **very** important as it is used to determine the speed of the fan. The ordering it slowest to fastest (top to bottom).
 5. Click Submit to add the fan.
+
+Optionally select a device to associate the fan with. The fan is linked to that
+device without taking ownership of it. Changing or clearing the device selection
+updates the association and removes stale devices previously created by the helper.

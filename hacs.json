@@ -1,6 +1,6 @@
 {
   "name": "Switch Fan",
-  "homeassistant": "0.118.0",
+  "homeassistant": "2026.8.0",
   "content_in_root": false,
   "render_readme": true
 }

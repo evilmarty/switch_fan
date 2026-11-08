@@ -6,9 +6,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_DEVICE_ID, CONF_ENTITIES, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.device import (
-    async_remove_stale_devices_links_keep_current_device,
-)
+from homeassistant.helpers.helper_integration import async_remove_helper_devices
 
 from .const import CONF_HIDE_MEMBERS
 
@@ -18,10 +16,11 @@ PLATFORMS = (Platform.FAN,)
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Switch Fan from a config entry."""
 
-    async_remove_stale_devices_links_keep_current_device(
+    async_remove_helper_devices(
         hass,
-        entry.entry_id,
-        entry.options.get(CONF_DEVICE_ID),
+        helper_config_entry_id=entry.entry_id,
+        source_device_id=entry.options.get(CONF_DEVICE_ID),
+        remove_all_devices=True,
     )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

@@ -17,9 +17,7 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.device import async_device_info_to_link_from_device_id
-from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import (
     Event,
@@ -46,9 +44,11 @@ async def async_setup_entry(
     ]
     name = config_entry.title
     unique_id = config_entry.entry_id
-    device_info = async_device_info_to_link_from_device_id(
-        hass,
-        config_entry.options.get(CONF_DEVICE_ID),
+    device_id = config_entry.options.get(CONF_DEVICE_ID)
+    device_entry = (
+        dr.async_get(hass).async_get(device_id, include_composite_devices=False)
+        if device_id is not None
+        else None
     )
 
     async_add_entities(
@@ -57,7 +57,7 @@ async def async_setup_entry(
                 unique_id=unique_id,
                 name=name,
                 entity_ids=entity_ids,
-                device_info=device_info,
+                device_entry=device_entry,
             )
         ]
     )
@@ -73,7 +73,7 @@ class SwitchFan(FanEntity):
         unique_id: str,
         name: str,
         entity_ids: list[str],
-        device_info: DeviceInfo | None,
+        device_entry: dr.AnyDeviceEntry | None,
     ) -> None:
         """Initialize the fan entity."""
         features = FanEntityFeature.TURN_ON | FanEntityFeature.TURN_OFF
@@ -86,7 +86,7 @@ class SwitchFan(FanEntity):
         self._attr_name = name
         self._attr_speed_count = len(entity_ids)
         self._attr_supported_features = features
-        self._attr_device_info = device_info
+        self.device_entry = device_entry
 
     async def call_service(self, service_name: str, entity_ids: list[str]) -> None:
         """Call service for the given entity IDs.
